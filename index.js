@@ -1,7 +1,7 @@
 const botconfig = require("./botconfig.json");
-const tokenfile = require("./token.json");
 const Discord = require("discord.js");
 const token = process.env.token;
+const PORT = process.env.PORT || 5000
 const fs = require("fs");
 const bot = new Discord.Client();
 let Voice = [];
@@ -14,6 +14,7 @@ let Xtime = require("./xp.json");
 let purple = botconfig.purple;
 let cooldown = new Set();
 let cdseconds = 5;
+
 
 
 fs.readdir("./commands/", (err, files) => {
