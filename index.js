@@ -1,8 +1,11 @@
 const botconfig = require("./botconfig.json");
 const Discord = require("discord.js");
-const token = process.env.token;
+const token = "NDgxNzg1MDg2NDM4NTM5Mjc1.DwQ2Rg.tJhGCJ0fsSIsrJn-6AC5muSvwcU";
+//const token1 = "NDgxNzg1MDg2NDM4NTM5Mjc1.Dl7ZBQ.wPUJNmejipT5f56_z00xnTKZf_0";
+//const token = process.env.token;
 const PORT = process.env.PORT || 5000
 const fs = require("fs");
+const mysql = require("mysql");
 const bot = new Discord.Client();
 let Voice = [];
 bot.commands = new Discord.Collection();
@@ -33,10 +36,26 @@ fs.readdir("./commands/", (err, files) => {
   });
 });
 
+var con = mysql.createConnection({
+	host: "sql2.freesqldatabase.com",
+	user: "sql2274820",
+	password: "rA7%zR3!",
+	database: "sql2274820"
+	//host: "den1.mysql6.gear.host",
+	//user: "rcbot1",
+	//password: "Pl9D!F75_6XD",
+	//database: "rcbot1"
+});
+
+con.connect(err => {
+	if(err) throw err;
+	console.log("Connected to DB");
+});
+
 bot.on("ready", async () => {
 
   console.log(`${bot.user.username} is online on ${bot.guilds.size} servers!`);
-  bot.user.setActivity("за хорошими людьми) (Prefix `!` для бота)", {type: "WATCHING"});
+  bot.user.setActivity("Я слежу за тобой", {type: "TEXT"});
 
 });
 
@@ -54,7 +73,7 @@ bot.on("voiceStateUpdate", (OldM, NewM, message)=> {
         Voice.push(NewM);
 
         function send(number) {
-            console.log(number, NewM.id);
+            console.log(number, NewM.id, coins);
 
             let check = 0;
             if (!NewM.voiceChannel) {
@@ -100,26 +119,6 @@ bot.on("voiceStateUpdate", (OldM, NewM, message)=> {
                   Xtime[NewM.id].level = curlvl + 1;
 }
 
-             //    let lvlup = new Discord.RichEmbed()
-             //     .setTitle(`${NewM.username} Level Up! `)
-              //    .setColor("#e60000")
-              //    .addField("Новый уровень!", curlvl + 1);
-
-
-
-
-
-
-
-               //    message.channel.send(lvlup).then(msg => {msg.delete(5000)});
-               //  }
-               // fs.writeFile("./xp.json", JSON.stringify(Xtime), (err) => {
-               //   if(err) console.log(err)
-               // });
-
-
-
-
                 function removeA(arr) {
                     var what, a = arguments, L = a.length, ax;
                     while (L > 1 && arr.length) {
@@ -154,22 +153,55 @@ bot.on("voiceStateUpdate", (OldM, NewM, message)=> {
 
 
                 removeA(Voice, NewM);
-
-                fs.writeFile("./VoiceTime.json", JSON.stringify(Vtime),err => {
-                    if(err) throw err;
-                });
-
+				
+		con.query(`SELECT * FROM rcbot WHERE did = "${NewM.id}"`, (err, result, rows, fields) =>{
+		let sql;
+		console.log(result);
+		if(result.length > 0) {
+			let time = rows[0].time;
+			sql = `UPDATE rcbot SET time = time + '${number - 1}' WHERE did = "${NewM.id}"`
+		} else {
+			sql = `INSERT INTO rcbot (did, level, time, coins, xp) VALUES ('${NewM.id}', 1, '${number - 1}', 0, 0)`;
+		}
+		con.query(sql);
+		});
                     removeB(Voice, NewM);
-
-                fs.writeFile("./coins.json", JSON.stringify(Mtime),err => {
-                    if(err) throw err;
-                });
-
+					
+		con.query(`SELECT * FROM rcbot`, (err, rows, fields) =>{
+		let sql;
+		let daid = rows[0].did;
+		let num = number - 1;
+		let n = num * (0.001);
+		let xcoins = n;
+		
+		
+		if(NewM.id === NewM.id) {
+			let coins = rows[0].coins;
+			let level = rows[0].level;
+			sql = `UPDATE rcbot SET coins = coins + level * '${xcoins}' WHERE did = "${NewM.id}"`
+		} else {
+			console.log(error);
+			//sql = `INSERT INTO rcbot (did, level, time, coins, xp) VALUES ('${NewM.id}', 1, '${number - 1}', 0, 0)`;
+		}
+		con.query(sql);
+		});
+		
                     removeC(Voice, NewM);
-
-                fs.writeFile("./xp.json", JSON.stringify(Xtime),err => {
-                    if(err) throw err;
-                });
+		con.query(`SELECT * FROM rcbot`, (err, rows, fields) =>{
+		let sql;
+		let daid = rows[0].did;
+		let num = number - 1;
+		let n = num * (1);
+		let xcoins = n;
+		if(NewM.id === NewM.id) {
+			let coins = rows[0].xp;
+			sql = `UPDATE rcbot SET xp = xp + '${xcoins}' WHERE did = "${NewM.id}"`
+		} else {
+			console.log(error);
+	
+		}
+		con.query(sql);
+		});
             }
 
             number++;
