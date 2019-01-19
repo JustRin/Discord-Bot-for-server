@@ -1,46 +1,26 @@
 const Discord = require("discord.js");
-const botconfig = require("../botconfig");
-let purple = botconfig.purple;
-let xp = require("../xp.json");
-let Time = require("../VoiceTime.json");
+const mysql = require("mysql");
 
-module.exports.run = async (bot, message, args) => {
-
-  if(!xp[message.author.id]){
-   xp[message.author.id] = {
-     xp: 0,
-     level: 1
-  };
-}
-if(!Time[message.author.id]){
-   Time[message.author.id] = {
-     time: 0
-  };
-}
-
-
-  let curxp = xp[message.author.id].xp;
-  let curlvl = xp[message.author.id].level;
-  let curtime = Time[message.author.id].time;
-  let curxpp = (curxp + 0).toFixed(2);
-  let levl = (curlvl * 0.01 + 0.04).toFixed(2)
-  let nxtLvlXp = curlvl * 1000;
-  let difference = (nxtLvlXp - curxp).toFixed(2);
-  let dif = (curtime / 60);
-  let diff = (dif / 60).toFixed(2);
-  let lvlEmbed = new Discord.RichEmbed()
-  .setAuthor(message.author.username)
-  .setColor("#ffa64d")
-  .addField("Level  ", curlvl, true)
-  .addField("XP  ", curxpp, true)
-  .addField("Времени в войсе  ", `${diff}` + ` ч.`, true)
-  .addField("Монет в секунду  ", `${levl}`, true)
-  .addField("Моножитель опыта ", `х1`, true)
-  .setFooter(`${difference} XP до следующего уровня   `, message.author.displayAvatarURL);
-
-  message.delete();
-  message.channel.send(lvlEmbed).then(msg => {msg.delete(10000)});
-
+module.exports.run = async (bot, message, args, member) => {
+  var con = mysql.createConnection({
+	host: "sql2.freesqldatabase.com",
+	user: "sql2274820",
+	password: "rA7%zR3!",
+	database: "sql2274820"
+});
+    con.query(`SELECT * FROM rcbot WHERE "${message.author.id}" = did`, (err, result, rows, fields) =>{
+		let lvlEmbed = new Discord.RichEmbed()
+        .setAuthor(message.author.username, message.author.displayAvatarURL)
+        .setColor("#ffa64d");
+        let pos = result.findIndex(obj => obj['did'] === message.author.id) + 1;
+        let data = result[pos - 1];
+		let time2 = data.time;
+		let time = (time2/60).toFixed(0);
+		lvlEmbed.addField("XP: ", `${data.xp}`, true)
+		lvlEmbed.addField("Level  ", `${data.level}`, true)
+		lvlEmbed.addField("Времени в войсе: ", `${time}` + ` мин.`, true)
+		message.channel.send(lvlEmbed);
+	});
 }
 
 module.exports.help = {
