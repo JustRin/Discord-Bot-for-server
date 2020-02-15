@@ -1,25 +1,32 @@
-const botconfig = require("./botconfig.json");
-const Discord = require("discord.js");
-const token = "NDgxNzg1MDg2NDM4NTM5Mjc1.DwQ2Rg.tJhGCJ0fsSIsrJn-6AC5muSvwcU";
-//const token1 = "NDgxNzg1MDg2NDM4NTM5Mjc1.Dl7ZBQ.wPUJNmejipT5f56_z00xnTKZf_0";
-//const token = process.env.token;
+/*
+Create by Evgeniy Yurenya
+Create in 07/16/2018
+Last Update 02/15/2020
+Link to a profile in social networks: https://vk.com/id118216244
+*/
+
+const botconfig = require("./botconfig.json"); //Connection of a configuration file
+const Discord = require("discord.js"); // Connection API discord
+const token = "NDgxNzg1MDg2NDM4NTM5Mjc1.DwQ2Rg.tJhGCJ0fsSIsrJn-6AC5muSvwcU"; //Token for entry
 const PORT = process.env.PORT || 5000
 const fs = require("fs");
 const mysql = require("mysql");
-const bot = new Discord.Client();
-let Voice = [];
+const bot = new Discord.Client(); //start work client app
+let Voice = []; //Array for counting time
 bot.commands = new Discord.Collection();
+//------Packaging Results in JSON(include a JSON files)-----------//
 let coins = require("./coins.json");
 let warn = require("./warnings.json");
 let Vtime = require("./VoiceTime.json");
 let Mtime = require("./coins.json");
 let Xtime = require("./xp.json");
+//----------------------------------------------------------------//
 let purple = botconfig.purple;
 let cooldown = new Set();
 let cdseconds = 5;
 
 
-
+//Connecting modules and starting them
 fs.readdir("./commands/", (err, files) => {
 
   if(err) console.log(err);
@@ -36,42 +43,36 @@ fs.readdir("./commands/", (err, files) => {
   });
 });
 
+//Database Connection
 var con = mysql.createConnection({
 	host: "sql2.freesqldatabase.com",
 	user: "sql2274820",
 	password: "rA7%zR3!",
 	database: "sql2274820"
-	//host: "den1.mysql6.gear.host",
-	//user: "rcbot1",
-	//password: "Pl9D!F75_6XD",
-	//database: "rcbot1"
 });
 
+//Check for errors in the database
 con.connect(err => {
 	if(err) throw err;
 	console.log("Connected to DB");
 });
 
+//Start bot
 bot.on("ready", async () => {
-
   console.log(`${bot.user.username} is online on ${bot.guilds.size} servers!`);
-  bot.user.setActivity("Я слежу за тобой", {type: "TEXT"});
-
+  bot.user.setActivity("I just see you", {type: "TEXT"});
 });
 
 
+//Checking voice channels for presence of active users
 bot.on("voiceStateUpdate", (OldM, NewM, message)=> {
-
     console.log(Voice);
-
     if(Voice.find(m => m.id === NewM.id)){
         return;
     }
-
     if(NewM.voiceChannel){
         let number = 0;
         Voice.push(NewM);
-
         function send(number) {
             console.log(number, NewM.id, coins);
 
@@ -118,7 +119,7 @@ bot.on("voiceStateUpdate", (OldM, NewM, message)=> {
                  if(nxtLvl <= Xtime[NewM.id].xp){
                   Xtime[NewM.id].level = curlvl + 1;
 }
-
+		//Writing data to a file
                 function removeA(arr) {
                     var what, a = arguments, L = a.length, ax;
                     while (L > 1 && arr.length) {
@@ -153,7 +154,7 @@ bot.on("voiceStateUpdate", (OldM, NewM, message)=> {
 
 
                 removeA(Voice, NewM);
-				
+		//Sending data to a database
 		con.query(`SELECT * FROM rcbot WHERE did = "${NewM.id}"`, (err, result, rows, fields) =>{
 		let sql;
 		console.log(result);
@@ -181,7 +182,6 @@ bot.on("voiceStateUpdate", (OldM, NewM, message)=> {
 			sql = `UPDATE rcbot SET coins = coins + level * '${xcoins}' WHERE did = "${NewM.id}"`
 		} else {
 			console.log(error);
-			//sql = `INSERT INTO rcbot (did, level, time, coins, xp) VALUES ('${NewM.id}', 1, '${number - 1}', 0, 0)`;
 		}
 		con.query(sql);
 		});
@@ -215,16 +215,13 @@ bot.on("voiceStateUpdate", (OldM, NewM, message)=> {
     }
 });
 
+//Automatic ban user
 bot.on("message", async message => {
-
-
-
-
   if(message.author.bot) return;
   if(message.channel.type === "dm") return;
   if(message.content.includes(" ͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌⃢͌͌͌")){
     message.delete();
-    message.member.ban("Пидор пытался положить сервер, у него это не получилось :c .");
+    message.member.ban("Spam that may cause the client to freeze.");
   }
 
   let prefixes = JSON.parse(fs.readFileSync("./prefixes.json", "utf8"));
@@ -268,4 +265,5 @@ bot.on("message", async message => {
 
 });
 
+//Token Connection Error Check
 bot.login(token).catch(err=> console.log(err));
